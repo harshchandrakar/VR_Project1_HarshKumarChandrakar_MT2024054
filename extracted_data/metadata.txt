@@ -1,0 +1,5 @@
+Feature type: combined
+Image dimensions: 128x128
+Classes: with_mask, without_mask
+Samples per class: [2162, 1930]
+Feature dimension: 8404
