@@ -1,6 +1,6 @@
 # Ignore dataset directory
 data/
-
+extracted_data/
 
 # Ignore Python virtual environments
 venv/
