@@ -540,8 +540,8 @@ def test_models(data_dir, model_names, models_dir="models"):
     
     return results
 
-def main(train = True):
-    data_dir = "../data"
+def main(train = True,data_dir = "../data"):
+    
     
     hyperparams_list = [
         {

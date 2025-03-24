@@ -5,6 +5,12 @@ import os
 from sklearn.metrics import precision_score, recall_score, f1_score
 import glob
 import matplotlib.pyplot as plt
+import sys
+# Add parent directory to path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from dataset.data_download import download_from_gdrive
+from utils.variables import *
 
 def load_dataset(csv_path):
     """
@@ -18,7 +24,6 @@ def load_dataset(csv_path):
     print(f"Images with masks: {len(mask_images)}")
     
     print(f"Selected samples: {len(mask_images)}")
-    print(f"First few images: {mask_images[:5]}")
     return mask_images
 
 def calculate_metrics(pred_mask, gt_mask):
@@ -183,14 +188,14 @@ def visualize_results(image, mask, gt_mask=None, save_path=None):
         plt.axis('off')
         plt.show()
 
-def process_dataset(input_folder, output_folder, gt_folder, num_samples):
+def process_dataset(input_folder, output_folder, gt_folder, num_samples,verbose=False):
     """
     Process the dataset and perform segmentation with visualization and evaluation
     """
 
     create_directories(output_folder, ['masks', 'overlays', 'visualizations'])
     
-    image_files = load_dataset('dataset/data/dataset.csv')
+    image_files = load_dataset('MFSD_dataset/MSFD/1/dataset.csv')
     image_files = image_files[:num_samples]
     
     total_images = len(image_files)
@@ -203,7 +208,8 @@ def process_dataset(input_folder, output_folder, gt_folder, num_samples):
     metrics = {metric: [] for metric in ['iou', 'precision', 'recall', 'f1']}
     
     for idx, image_file in enumerate(image_files, 1):
-        print(f"\nProcessing image {idx}/{total_images}: {image_file}")
+        if verbose:
+            print(f"\nProcessing image {idx}/{total_images}: {image_file}")
         
         base_name = os.path.splitext(image_file)[0]
         
@@ -247,12 +253,12 @@ def process_dataset(input_folder, output_folder, gt_folder, num_samples):
                     metrics['precision'].append(precision)
                     metrics['recall'].append(recall)
                     metrics['f1'].append(f1)
-                    
-                    print(f"Metrics for {image_file}:")
-                    print(f"IoU: {iou:.4f}")
-                    print(f"Precision: {precision:.4f}")
-                    print(f"Recall: {recall:.4f}")
-                    print(f"F1 Score: {f1:.4f}")
+                    if verbose:
+                        print(f"Metrics for {image_file}:")
+                        print(f"IoU: {iou:.4f}")
+                        print(f"Precision: {precision:.4f}")
+                        print(f"Recall: {recall:.4f}")
+                        print(f"F1 Score: {f1:.4f}")
             
             # Visualize Results
             vis_path = os.path.join(output_folder, 'visualizations', f"{base_name}_vis.png")
@@ -274,10 +280,15 @@ def process_dataset(input_folder, output_folder, gt_folder, num_samples):
             print(f"Average {metric.upper()}: {mean_val:.4f} (Median: {median_val:.4f}, Std: {std_val:.4f})")
         
 
-if __name__ == "__main__":
-    input_folder = "dataset/data/face_crop"
+def main(images,download = False,verbose=False):
+    if download:
+        download_from_gdrive(DATASET_URL_2)
+    input_folder = "MFSD_dataset/MSFD/1/face_crop"
     output_folder = "results/region_segmentation"
-    gt_folder = "dataset/data/face_crop_segmentation"
+    gt_folder = "MFSD_dataset/MSFD/1/face_crop_segmentation"
     
-    process_dataset(input_folder, output_folder, gt_folder, 100)
+    process_dataset(input_folder, output_folder, gt_folder, images,verbose=verbose)
     print("\nSegmentation and evaluation completed.")
+
+if __name__ == "__main__":
+    main(100,download=True,verbose=False)

@@ -1,0 +1,104 @@
+Zip file MFSD_dataset.zip already exists. Skipping download.
+Extracting MFSD_dataset.zip...
+Extraction complete. Files extracted to MFSD_dataset
+-----------------------Evaluating Task1------------------------
+Data loaded. Features shape: (4092, 8404), Labels shape: (4092,)
+Data split: 3273 training samples, 819 testing samples
+Accuracy of SVM on rbf kernel: 0.9353
+Accuracy of SVM on sigmoid kernel: 0.7424
+Accuracy of SVM on linear kernel: 0.9206
+Loaded best model from disk. Final evaluation:
+Test Accuracy on Neural Network: 92.19%
+-----------------------Evaluating Task2------------------------
+Downloading dataset...
+Using existing dataset at ./data
+Dataset downloaded successfully.
+Found 2 classes: with_mask, without_mask
+Class 'with_mask': Found 2156 images
+Class 'with_mask': Copied 1509 images to train set
+Class 'with_mask': Copied 323 images to validation set
+Class 'with_mask': Copied 324 images to test set
+Class 'without_mask': Found 1930 images
+Class 'without_mask': Copied 1351 images to train set
+Class 'without_mask': Copied 289 images to validation set
+Class 'without_mask': Copied 290 images to test set
+Using MPS acceleration on Mac
+
+Testing model: model_adam_lr001.pth
+Test Accuracy: 97.56%
+Confusion Matrix:
+[[318   6]
+ [  9 281]]
+Classification Report:
+              precision    recall  f1-score   support
+
+           0       0.97      0.98      0.98       324
+           1       0.98      0.97      0.97       290
+
+    accuracy                           0.98       614
+   macro avg       0.98      0.98      0.98       614
+weighted avg       0.98      0.98      0.98       614
+
+Sample prediction: with_mask with 99.67% confidence
+
+Testing model: model_sgd_lr0005.pth
+Test Accuracy: 94.46%
+Confusion Matrix:
+[[303  21]
+ [ 13 277]]
+Classification Report:
+              precision    recall  f1-score   support
+
+           0       0.96      0.94      0.95       324
+           1       0.93      0.96      0.94       290
+
+    accuracy                           0.94       614
+   macro avg       0.94      0.95      0.94       614
+weighted avg       0.95      0.94      0.94       614
+
+Sample prediction: with_mask with 78.73% confidence
+
+Testing model: model_adam_lr0003.pth
+Test Accuracy: 97.07%
+Confusion Matrix:
+[[313  11]
+ [  7 283]]
+Classification Report:
+              precision    recall  f1-score   support
+
+           0       0.98      0.97      0.97       324
+           1       0.96      0.98      0.97       290
+
+    accuracy                           0.97       614
+   macro avg       0.97      0.97      0.97       614
+weighted avg       0.97      0.97      0.97       614
+
+Sample prediction: with_mask with 99.88% confidence
+
+===== Test Results Summary =====
+model_adam_lr001.pth: Accuracy = 97.56%
+model_sgd_lr0005.pth: Accuracy = 94.46%
+model_adam_lr0003.pth: Accuracy = 97.07%
+-----------------------Evaluating Task3------------------------
+Reading CSV file from: MFSD_dataset/MSFD/1/dataset.csv
+Images with masks: 9610
+Selected samples: 9610
+
+Found 100 images with masks
+
+Segmentation Evaluation Summary:
+Total images evaluated: 100
+Average IOU: 0.4636 (Median: 0.4689, Std: 0.2649)
+Average PRECISION: 0.5880 (Median: 0.6621, Std: 0.2720)
+Average RECALL: 0.6596 (Median: 0.8349, Std: 0.3554)
+Average F1: 0.5823 (Median: 0.6384, Std: 0.2870)
+
+Segmentation and evaluation completed.
+-----------------------Evaluating Task4------------------------
+Using MPS device (Apple Silicon GPU)
+
+Loaded model from epoch 10
+
+Evaluating model performance...
+Average IoU Score: 0.9220
+Average Dice Score: 0.9591

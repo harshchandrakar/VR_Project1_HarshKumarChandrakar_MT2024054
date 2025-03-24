@@ -19,7 +19,6 @@ def svm_model(X_train, X_test, y_train, y_test,kernel):
     svm_model = SVC(kernel=kernel) 
     svm_model.fit(X_train, y_train)
 
-
     y_pred = svm_model.predict(X_test)
 
     accuracy = accuracy_score(y_test, y_pred)
@@ -42,7 +41,12 @@ class BinaryClassifier(nn.Module):
         x = torch.sigmoid(self.fc3(x)).squeeze(1)
         return x
 
-def train_model(model, dataloader, criterion, optimizer, num_epochs=10):
+def train_model(model, dataloader, test_dataloader, criterion, optimizer, best_model_path, num_epochs=10):
+    # Create directory if it doesn't exist
+    os.makedirs(os.path.dirname(best_model_path), exist_ok=True)
+    
+    best_acc = 0.0
+    
     for epoch in range(num_epochs):
         model.train()  # Set model to training mode
         running_loss = 0.0
@@ -62,13 +66,24 @@ def train_model(model, dataloader, criterion, optimizer, num_epochs=10):
             correct += (predicted == batch_y).sum().item()
         
         epoch_acc = 100 * correct / total
+        
+        # Evaluate on test set to track best model
+        if (epoch + 1) % 10 == 0:  # Check every 10 epochs to save computation
+            test_acc = evaluate(model, test_dataloader, verbose=False)
+            if test_acc > best_acc:
+                best_acc = test_acc
+                # Save best model
+                torch.save(model.state_dict(), best_model_path)
+                print(f'Epoch {epoch+1}, New best model saved with test accuracy: {test_acc:.2f}%')
+        
         if ((epoch+1)%50 == 0):
-            print(f'Epoch {epoch+1}, Loss: {running_loss/len(dataloader):.4f}, Accuracy: {epoch_acc:.2f}%')
+            print(f'Epoch {epoch+1}, Loss: {running_loss/len(dataloader):.4f}, Training Accuracy: {epoch_acc:.2f}%')
 
-    return model
+    print(f'Best model test accuracy: {best_acc:.2f}%')
+    return best_model_path
 
 
-def evaluate(model, dataloader):
+def evaluate(model, dataloader, verbose=True):
     model.eval()  # Set model to evaluation mode
     correct = 0
     total = 0
@@ -81,24 +96,39 @@ def evaluate(model, dataloader):
             correct += (predicted == batch_y).sum().item()
     
     accuracy = 100 * correct / total
-    print(f'Test Accuracy: {accuracy:.2f}%')
+    if verbose:
+        print(f'Test Accuracy on Neural Network: {accuracy:.2f}%')
     return accuracy
 
-def main(extract=False):
-    create_data = ImageFeatureExtractor(DATASET_URL_1,CLASSES_1,IMAGE_HEIGHT,IMAGE_WIDTH,"combined","../data")
+def main(extract=False, train=True, output_dir="extracted_data"):
+    # Use absolute paths to ensure consistency when called from different directories
+    # Get the current script directory
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    # Get the project root directory (one level up)
+    project_root = os.path.dirname(script_dir)
+    
+    # Define paths relative to project root
+    data_dir = os.path.join(project_root, "data")
+    output_dir = os.path.join(project_root, output_dir)
+    models_dir = os.path.join(project_root, "models")
+    
+    # Ensure directories exist
+    os.makedirs(models_dir, exist_ok=True)
+    os.makedirs(output_dir, exist_ok=True)
+    
+    create_data = ImageFeatureExtractor(DATASET_URL_1, CLASSES_1, IMAGE_HEIGHT, IMAGE_WIDTH, "combined", data_dir)
 
     if extract:
-        create_data.extract_and_save_data(output_dir="../extracted_data")
+        create_data.extract_and_save_data(output_dir)
 
-    X_train, X_test, y_train, y_test = create_data.split_data(test_size=0.2,random_state=42)
+    X_train, X_test, y_train, y_test = create_data.split_data(test_size=0.2, random_state=42,output_dir=output_dir)
 
     # because rbf works better if there is complex data
-    svm_model(X_train, X_test, y_train, y_test,'rbf')
-    #sigmoid if data is suitable for neural network classification problem 
-    svm_model(X_train, X_test, y_train, y_test,'sigmoid')
+    svm_model(X_train, X_test, y_train, y_test, 'rbf')
+    # sigmoid if data is suitable for neural network classification problem 
+    svm_model(X_train, X_test, y_train, y_test, 'sigmoid')
     
-    svm_model(X_train, X_test, y_train, y_test,'linear')
-
+    svm_model(X_train, X_test, y_train, y_test, 'linear')
 
     # Neural network
     model = BinaryClassifier()
@@ -114,19 +144,20 @@ def main(extract=False):
     test_dataset = TensorDataset(X_test, y_test)
     test_dataloader = DataLoader(test_dataset, batch_size=16, shuffle=False)
 
-    # Train using training data
-    model = train_model(model, train_dataloader, criterion, optimizer, num_epochs=300)
-    # Evaluate on test dataset
-    evaluate(model, test_dataloader)
-
-
+    # Train and save the best model - use absolute path
+    best_model_path = os.path.join(models_dir, "ml_classification.pth")
+    if train:
+        train_model(model, train_dataloader, test_dataloader, criterion, optimizer, best_model_path, num_epochs=300)
+    
+    # Check if model file exists before loading
+    if os.path.exists(best_model_path):
+        best_model = BinaryClassifier()
+        best_model.load_state_dict(torch.load(best_model_path))
+        
+        print("Loaded best model from disk. Final evaluation:")
+        evaluate(best_model, test_dataloader)
+    else:
+        print(f"Model file {best_model_path} does not exist. Skipping evaluation.")
 
 if __name__ == "__main__":
-    main(extract=True)
-
-
-
-
-
-
-
+    main(extract=False, train=False)
