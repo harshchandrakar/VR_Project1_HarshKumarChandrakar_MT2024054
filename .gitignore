@@ -3,7 +3,7 @@ data/
 extracted_data/
 data_split/
 MFSD_dataset/
-
+classification/models/
 
 # Ignore Python virtual environments
 venv/

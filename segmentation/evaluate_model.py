@@ -1,7 +1,7 @@
 import torch
 from torch.utils.data import DataLoader
 from torchvision import transforms
-from mask_segmentation import UNet, SegmentationDataset, evaluate_model
+from segmentation.mask_segmentation import UNet, SegmentationDataset, evaluate_model
 import os
 
 def main():
