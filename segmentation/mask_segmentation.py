@@ -370,7 +370,7 @@ def main():
     val_size = len(dataset) - train_size
     train_dataset, val_dataset = torch.utils.data.random_split(dataset, [train_size, val_size])
     
-    # Set up device - add MPS support for Apple Silicon
+    # Set up device
     if torch.backends.mps.is_available():
         device = torch.device("mps")
         print(f"Using MPS device (Apple Silicon GPU)")
@@ -382,7 +382,7 @@ def main():
         print(f"Using CPU device")
     
     # Optimized parameters for M3 Pro Apple Silicon
-    batch_size = 16   # M3 Pro can handle larger batches
+    batch_size = 16
     num_workers = 4  
     learning_rate = 3e-4  
     epochs = 10 # takes 2 hours if GPU cores are used and display is always on
