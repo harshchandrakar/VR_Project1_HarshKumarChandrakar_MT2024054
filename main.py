@@ -8,7 +8,6 @@ import os
 
 
 def main(download=False):
-    # Create necessary directories if they don't exist
     os.makedirs("models", exist_ok=True)
     os.makedirs("extracted_data", exist_ok=True)
     os.makedirs("data", exist_ok=True)
@@ -17,12 +16,10 @@ def main(download=False):
         download_from_gdrive(DATASET_URL_2)
 
     print("-----------------------Evaluating Task1------------------------")
-    # Using correct path relative to project root and setting extract=True to ensure data is available
     task1(extract=False, train=False, output_dir="./extracted_data")
 
     print("-----------------------Evaluating Task2------------------------")
-    # Make sure task2 runs with appropriate training flag
-    task2(train=False,data_dir="./data")  # Set to False if models are already trained and you just want to evaluate
+    task2(train=False,data_dir="./data")  
 
     print("-----------------------Evaluating Task3------------------------")
     task3(100, download=False, verbose=False)
@@ -32,4 +29,4 @@ def main(download=False):
 
 
 if __name__ == '__main__':
-    main(download=True)  # Set to True if you need to download data
+    main(download=True)
