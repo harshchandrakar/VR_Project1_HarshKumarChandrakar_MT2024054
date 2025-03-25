@@ -232,10 +232,10 @@ Parameters:
 
 #### Task 3 (Traditional Segmentation)
 - **Segmentation Evaluation:**
-  - Average IoU: **0.4636**
-  - Precision: **0.5880**
-  - Recall: **0.6596**
-  - F1 Score: **0.5823**
+  - Average IoU: **0.4970**
+  - Precision: **0.6243**
+  - Recall: **0.6497**
+  - F1 Score: **0.6047**
 - **Challenges:**
   - Traditional segmentation struggles with complex image features.
   - Heavily reliant on thresholding techniques which may not generalize well.
